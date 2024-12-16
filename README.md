@@ -37,12 +37,12 @@ If you do not have an Apple Developer account, you can still run the app on your
 Open a terminal and clone this repository:
 
 ```bash
-git clone https://github.com/your-username/yutub.git
+git clone https://github.com/pballada/yutub.git
 cd yutub
 
 ### 2. Open the Project in Xcode
-1. Launch **Xcode**.
-2. Open the project by selecting `Yutub.xcodeproj`.now step 3
+1. Download and Launch **Xcode**.
+2. Open the project by selecting `Yutub.xcodeproj`.
 
 ### 3. Modify the Bundle Identifier
 To bypass the Apple Developer account requirement, you must set a unique bundle identifier:
@@ -54,6 +54,16 @@ To bypass the Apple Developer account requirement, you must set a unique bundle 
 1. Under the **Team** dropdown, select your **Personal Team**. If no team is listed, add one by logging in with your Apple ID in Xcode.
 2. Xcode will handle code signing automatically.
 
+### 5.Enable Developer Mode on Vision Pro
+1.	Open Settings on Vision Pro.
+2.	Go to Privacy & Security > Developer Mode.
+3.	Toggle Developer Mode on and restart if prompted.
+
+### 6.Pair Vision Pro with Xcode
+1.	Turn on Vision Pro and connect to the same Wi-Fi as your Mac.
+2.	Open Xcode, go to Window > Devices and Simulators.
+3.	Select Pair Device and enter the pairing code displayed on Vision Pro.
+	
 ### 5. Build and Run the App
 1. Select either the VisionOS Simulator or connect a Vision Pro device as the build target.
 2. Click the **Run** button (or press `Cmd + R`) to install and launch the app on your device.
