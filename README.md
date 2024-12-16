@@ -39,6 +39,7 @@ Open a terminal and clone this repository:
 ```bash
 git clone https://github.com/pballada/yutub.git
 cd yutub
+```
 
 ### 2. Open the Project in Xcode
 1. Download and Launch **Xcode**.
