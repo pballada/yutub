@@ -103,14 +103,14 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
             return
         }
 
-       // if isYouTubeRelated(url: url) {
+        if isYouTubeRelated(url: url) {
             // Allow navigation within the web view
             decisionHandler(.allow)
-//        } else {
-//            // Open non-YouTube links in Safari
-//            UIApplication.shared.open(url)
-//            decisionHandler(.cancel)
-//        }
+        } else {
+            // Open non-YouTube links in Safari
+            UIApplication.shared.open(url)
+            decisionHandler(.cancel)
+        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -119,7 +119,7 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
     }
 
     private func isYouTubeRelated(url: URL) -> Bool {
-        let youtubeDomains = ["youtube.com", "youtu.be"]
+        let youtubeDomains = ["youtube.com", "youtu.be", "accounts.google.com"]
         return youtubeDomains.contains { url.host?.contains($0) == true }
     }
 }
