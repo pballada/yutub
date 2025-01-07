@@ -16,7 +16,6 @@ class SettingsStore: ObservableObject {
 
 // MARK: - WebView Logic
 struct YoutubeWebView: UIViewRepresentable {
-    let url: URL
     @ObservedObject var webViewStore: WebViewStore
     @EnvironmentObject var settings: SettingsStore
 
@@ -25,7 +24,6 @@ struct YoutubeWebView: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         webView.backgroundColor = settings.isDarkMode ? .black : .white
         webView.scrollView.backgroundColor = settings.isDarkMode ? .black : .white
-        webView.load(URLRequest(url: url))
         return webView
     }
     
@@ -65,6 +63,25 @@ struct YoutubeWebView: UIViewRepresentable {
                 }
             })();
             """
+        
+        // Apply custom styles for the scrubber button
+        let modifyScrubberButtonStyleScript = """
+            (function() {
+                const style = document.createElement('style');
+                style.innerHTML = `
+                .ytp-scrubber-button {
+                    width: 20px !important;
+                    height: 20px !important;
+                    border-radius: 10px !important;
+                    transform: translate(-5px, -5px) !important;
+                }
+                .ytp-scrubber-button:focus {
+                    background-color: darkred !important;
+                }
+                `;
+                document.head.appendChild(style);
+            })();
+            """
 
         // Inject scripts and log errors if any
         webView.evaluateJavaScript(checkAndApplyDarkModeScript) { _, error in
@@ -76,6 +93,12 @@ struct YoutubeWebView: UIViewRepresentable {
         webView.evaluateJavaScript(checkAndApplyAutoplayScript) { _, error in
             if let error = error {
                 print("Error injecting autoplay script: \(error.localizedDescription)")
+            }
+        }
+        
+        webView.evaluateJavaScript(modifyScrubberButtonStyleScript) { _, error in
+            if let error = error {
+                print("Error modifying scrubber button size: \(error.localizedDescription)")
             }
         }
     }
@@ -127,37 +150,32 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
 // MARK: - Main ContentView
 struct ContentView: View {
     @State private var selectedTab = 0
-    @State private var webViewStores: [WebViewStore] = [
-        WebViewStore(),
-        WebViewStore(),
-        WebViewStore(),
-        WebViewStore()
-    ]
-    
-    @StateObject private var settings = SettingsStore()
+    @StateObject private var webViewStore = WebViewStore()
+    @State private var currentURL: URL = URL(string: "https://www.youtube.com")!
+    @EnvironmentObject  var settings: SettingsStore
     
     var body: some View {
         TabView(selection: $selectedTab.onChange { newValue in
             // Pause video on tab switch to avoid overlapping audio
-            pauseAllExceptCurrentTab(currentTab: newValue)
+            updateWebViewURL(for: newValue)
         }) {
             // Home Tab
-            TabViewContentView(url: URL(string: "https://www.youtube.com")!, webViewStore: webViewStores[0])
+            Text("Home")
                 .tabItem { Label("Home", systemImage: "house") }
                 .tag(0)
             
             // Watch Later Tab
-            TabViewContentView(url: URL(string: "https://www.youtube.com/playlist?list=WL")!, webViewStore: webViewStores[1])
+            Text("Watch Later")
                 .tabItem { Label("Watch Later", systemImage: "clock") }
                 .tag(1)
             
             // Subscriptions Tab
-            TabViewContentView(url: URL(string: "https://www.youtube.com/feed/subscriptions")!, webViewStore: webViewStores[2])
+            Text("Subscriptions")
                 .tabItem { Label("Subscriptions", systemImage: "rectangle.stack.person.crop") }
                 .tag(2)
             
             // History Tab
-            TabViewContentView(url: URL(string: "https://www.youtube.com/feed/history")!, webViewStore: webViewStores[3])
+            Text("History")
                 .tabItem { Label("History", systemImage: "clock.arrow.circlepath") }
                 .tag(3)
             
@@ -169,14 +187,33 @@ struct ContentView: View {
         // Bind the system color scheme to the setting
         .environment(\.colorScheme, settings.isDarkMode ? .dark : .light)
         .environmentObject(settings)
+        .overlay(
+            Group {
+                            if selectedTab != 4 {
+                                YoutubeWebView(webViewStore: webViewStore)
+                                    .edgesIgnoringSafeArea(.all)
+                            }
+                        }
+                )
+        .onAppear {
+            webViewStore.webView.load(URLRequest(url: currentURL))
+        }
     }
     
-    private func pauseAllExceptCurrentTab(currentTab: Int) {
-        webViewStores.indices.forEach { index in
-            if index != currentTab {
-                webViewStores[index].webView.evaluateJavaScript("document.querySelector('video')?.pause();", completionHandler: nil)
-            }
+    private func updateWebViewURL(for tab: Int) {
+        switch tab {
+        case 0:
+            currentURL = URL(string: "https://www.youtube.com")!
+        case 1:
+            currentURL = URL(string: "https://www.youtube.com/playlist?list=WL")!
+        case 2:
+            currentURL = URL(string: "https://www.youtube.com/feed/subscriptions")!
+        case 3:
+            currentURL = URL(string: "https://www.youtube.com/feed/history")!
+        default:
+            break
         }
+        webViewStore.webView.load(URLRequest(url: currentURL))
     }
 }
 
@@ -187,7 +224,7 @@ struct TabViewContentView: View {
     
     var body: some View {
         ZStack {
-            YoutubeWebView(url: url, webViewStore: webViewStore)
+            YoutubeWebView(webViewStore: webViewStore)
                 .edgesIgnoringSafeArea(.all)
         }
     }
@@ -243,6 +280,7 @@ struct VisionProApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(SettingsStore())
         }
     }
 }
