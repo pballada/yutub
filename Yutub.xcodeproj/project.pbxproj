@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5F2718E52DF6F72D0050949D /* VisionProApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2718E42DF6F7270050949D /* VisionProApp.swift */; };
+		5F2718E72DF6F74E0050949D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2718E62DF6F7490050949D /* SettingsView.swift */; };
+		5F2718E92DF6F7BA0050949D /* YoutubeWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F2718E82DF6F7B40050949D /* YoutubeWebView.swift */; };
 		5FD4955D2CB456BA00052FEC /* RealityKitContent in Frameworks */ = {isa = PBXBuildFile; productRef = 5FD4955C2CB456BA00052FEC /* RealityKitContent */; };
 		5FD495612CB456BA00052FEC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD495602CB456BA00052FEC /* ContentView.swift */; };
 		5FD495632CB456BD00052FEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FD495622CB456BD00052FEC /* Assets.xcassets */; };
@@ -25,6 +28,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5F2718E42DF6F7270050949D /* VisionProApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionProApp.swift; sourceTree = "<group>"; };
+		5F2718E62DF6F7490050949D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		5F2718E82DF6F7B40050949D /* YoutubeWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoutubeWebView.swift; sourceTree = "<group>"; };
 		5FD495572CB456BA00052FEC /* Yutub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yutub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FD4955B2CB456BA00052FEC /* RealityKitContent */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = RealityKitContent; sourceTree = "<group>"; };
 		5FD495602CB456BA00052FEC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -34,6 +40,10 @@
 		5FD4956C2CB456BD00052FEC /* YutubTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YutubTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FD495702CB456BD00052FEC /* WhassapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhassapTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5F487BA32DF2FB4D00C3B011 /* scripts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = scripts; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		5FD495542CB456BA00052FEC /* Frameworks */ = {
@@ -77,6 +87,10 @@
 			isa = PBXGroup;
 			children = (
 				5FD495602CB456BA00052FEC /* ContentView.swift */,
+				5F2718E82DF6F7B40050949D /* YoutubeWebView.swift */,
+				5F2718E62DF6F7490050949D /* SettingsView.swift */,
+				5F2718E42DF6F7270050949D /* VisionProApp.swift */,
+				5F487BA32DF2FB4D00C3B011 /* scripts */,
 				5FD495622CB456BD00052FEC /* Assets.xcassets */,
 				5FD495672CB456BD00052FEC /* Info.plist */,
 				5FD495642CB456BD00052FEC /* Preview Content */,
@@ -122,6 +136,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5F487BA32DF2FB4D00C3B011 /* scripts */,
 			);
 			name = Yutub;
 			packageProductDependencies = (
@@ -211,7 +228,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5F2718E72DF6F74E0050949D /* SettingsView.swift in Sources */,
+				5F2718E92DF6F7BA0050949D /* YoutubeWebView.swift in Sources */,
 				5FD495612CB456BA00052FEC /* ContentView.swift in Sources */,
+				5F2718E52DF6F72D0050949D /* VisionProApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
