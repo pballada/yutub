@@ -1,5 +1,9 @@
 # Yutub: A SwiftUI YouTube Client
 
+<p align="center">
+  <img src="logo.png" alt="Yutub App Icon" width="120" />
+</p>
+
 Yutub is a lightweight YouTube client built using **SwiftUI** and **WebKit**. This project allows users to browse YouTube with added customizations like dark mode, autoplay toggles, and multi-tab navigation. The app is optimized for visionOS, offering a native app experience for users who prefer an actual app than to browse YouTube in Safari.
 
 ---
@@ -8,7 +12,10 @@ Yutub is a lightweight YouTube client built using **SwiftUI** and **WebKit**. Th
 
 - **Tabbed Interface**:
   - Quickly switch between Home, Watch Later, Subscriptions, History, and Settings.
-  
+- **Customized controls over the video**
+  - Now it's much easier to play, pause, and go to previous or next without mistakes.
+- **Bigger thumb size to improve control**
+  - It's easier than ever to move the progress track thumb now.
 - **Dark Mode**:
   - Toggle dark mode to adjust the interface and YouTube content based on your preference.
 
