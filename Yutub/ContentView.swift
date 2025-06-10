@@ -57,7 +57,7 @@ struct ContentView: View {
             }
         )
         .ornament(attachmentAnchor: .scene(.top),
-                  contentAlignment: .center
+                  contentAlignment: .bottom
         ) {
             if selectedTab != 4 && webViewStore.canGoBack {
                 Button {

@@ -23,7 +23,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
-    gap: 20px;
+    gap: 32px;
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
@@ -32,7 +32,7 @@
   `;
 
   const buttonStyle = `
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.35);
     border: none;
     border-radius: 50%;
     width: 60px;
@@ -46,7 +46,6 @@
     transition: all 0.2s ease;
     pointer-events: auto;
     transform: scale(1);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   `;
 
   const prevBtn = document.createElement('button');
@@ -80,17 +79,15 @@
 
   [prevBtn, playBtn, nextBtn].forEach((btn) => {
     btn.addEventListener('focus', () => {
-      btn.style.background = 'rgba(0, 0, 0, 0.95)';
-      btn.style.transform = 'scale(1.1)';
-      btn.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.8)';
+      btn.style.background = 'rgba(0, 0, 0, 0.6)';
+      btn.style.transform = 'scale(1.2)';
       centerControls.style.opacity = '1';
       centerControls.style.visibility = 'visible';
     });
 
     btn.addEventListener('blur', () => {
-      btn.style.background = 'rgba(0, 0, 0, 0.8)';
+      btn.style.background = 'rgba(0, 0, 0, 0.35)';
       btn.style.transform = 'scale(1)';
-      btn.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
       setTimeout(syncControlsVisibility, 100);
     });
   });

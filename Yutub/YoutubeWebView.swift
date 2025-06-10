@@ -106,7 +106,11 @@ class WebViewStore: NSObject, ObservableObject, WKScriptMessageHandler {
         
         let config = WKWebViewConfiguration()
         config.userContentController = contentController
+        if #available(macOS 12.3, *) {
+            config.preferences.isElementFullscreenEnabled = true
+        }
         self.webView = WKWebView(frame: .zero, configuration: config)
+        self.webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
         
         // Add KVO observer for canGoBack
         backObserver = webView.observe(\.canGoBack, options: [.initial, .new]) { [weak self] webView, change in
