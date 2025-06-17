@@ -12,6 +12,7 @@ import SwiftUI
 struct YoutubeWebView: UIViewRepresentable {
     @ObservedObject var webViewStore: WebViewStore
     @EnvironmentObject var settings: SettingsStore
+    @Binding var showBackButton: Bool
     
     func makeUIView(context: Context) -> WKWebView {
         let webView = webViewStore.webView!
@@ -26,7 +27,7 @@ struct YoutubeWebView: UIViewRepresentable {
     }
     
     func makeCoordinator() -> WebViewCoordinator {
-        WebViewCoordinator(self)
+        WebViewCoordinator(self, showBackButton: $showBackButton)
     }
     
     func applyCurrentSettingsToWebView(_ webView: WKWebView) {
@@ -143,9 +144,12 @@ class WebViewStore: NSObject, ObservableObject, WKScriptMessageHandler {
 
 class WebViewCoordinator: NSObject, WKNavigationDelegate {
     var parent: YoutubeWebView
+    var showBackButton: Binding<Bool>
+    private var lastNavigationType: WKNavigationType = .other
     
-    init(_ parent: YoutubeWebView) {
+    init(_ parent: YoutubeWebView, showBackButton: Binding<Bool>) {
         self.parent = parent
+        self.showBackButton = showBackButton
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -154,12 +158,18 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
             return
         }
         
+        // Track the navigation type
+        lastNavigationType = navigationAction.navigationType
+        
         if isYouTubeRelated(url: url) {
             // Allow navigation within the web view
             decisionHandler(.allow)
-        } else {
-            // Open non-YouTube links in Safari
+        } else if navigationAction.navigationType == .linkActivated {
+            // Only open in Safari if user tapped a link
             UIApplication.shared.open(url)
+            decisionHandler(.cancel)
+        } else {
+            // For other navigation types, just cancel (don't open Safari)
             decisionHandler(.cancel)
         }
     }
@@ -171,6 +181,13 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
         // Update navigation state
         DispatchQueue.main.async {
             self.parent.webViewStore.canGoBack = webView.canGoBack
+            // Only show back button if navigation was user-initiated
+            switch self.lastNavigationType {
+            case .linkActivated, .formSubmitted, .backForward:
+                self.showBackButton.wrappedValue = true
+            default:
+                break
+            }
         }
     }
     

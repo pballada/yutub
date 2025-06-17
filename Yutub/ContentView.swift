@@ -14,6 +14,7 @@ struct ContentView: View {
     @StateObject private var webViewStore = WebViewStore()
     @State private var currentURL: URL = URL(string: "https://www.youtube.com")!
     @EnvironmentObject  var settings: SettingsStore
+    @State private var showBackButton = false
     
     var body: some View {
         TabView(selection: $selectedTab.onChange { newValue in
@@ -51,7 +52,7 @@ struct ContentView: View {
         .overlay(
             Group {
                 if selectedTab != 4 {
-                    YoutubeWebView(webViewStore: webViewStore)
+                    YoutubeWebView(webViewStore: webViewStore, showBackButton: $showBackButton)
                         .edgesIgnoringSafeArea(.all)
                 }
             }
@@ -59,7 +60,7 @@ struct ContentView: View {
         .ornament(attachmentAnchor: .scene(.top),
                   contentAlignment: .bottom
         ) {
-            if selectedTab != 4 && webViewStore.canGoBack {
+            if selectedTab != 4 && webViewStore.canGoBack && showBackButton {
                 Button {
                     webViewStore.goBack()
                 } label: {
@@ -74,6 +75,7 @@ struct ContentView: View {
     }
     
     private func updateWebViewURL(for tab: Int) {
+        showBackButton = false // Hide back button on tab switch
         switch tab {
         case 0:
             currentURL = URL(string: "https://www.youtube.com")!
