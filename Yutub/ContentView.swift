@@ -64,9 +64,10 @@ struct ContentView: View {
                 Button {
                     webViewStore.goBack()
                 } label: {
-                    Text("Back")
+                    Label("Back", systemImage: "chevron.backward")
                 }
                 .glassBackgroundEffect()
+                .accessibilityIdentifier("navigation.back")
             }
         }
         .onAppear {
@@ -75,7 +76,8 @@ struct ContentView: View {
     }
     
     private func updateWebViewURL(for tab: Int) {
-        showBackButton = false // Hide back button on tab switch
+        showBackButton = false
+        webViewStore.canGoBack = false
         switch tab {
         case 0:
             currentURL = URL(string: "https://www.youtube.com")!

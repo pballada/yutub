@@ -145,7 +145,7 @@ class WebViewStore: NSObject, ObservableObject, WKScriptMessageHandler {
 class WebViewCoordinator: NSObject, WKNavigationDelegate {
     var parent: YoutubeWebView
     var showBackButton: Binding<Bool>
-    private var lastNavigationType: WKNavigationType = .other
+    private var pendingUserInitiatedNavigation = false
     
     init(_ parent: YoutubeWebView, showBackButton: Binding<Bool>) {
         self.parent = parent
@@ -158,43 +158,42 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
             return
         }
         
-        // Track the navigation type
-        lastNavigationType = navigationAction.navigationType
+        pendingUserInitiatedNavigation = isUserInitiated(navigationAction.navigationType)
         
         if isYouTubeRelated(url: url) {
-            // Allow navigation within the web view
             decisionHandler(.allow)
         } else if navigationAction.navigationType == .linkActivated {
-            // Only open in Safari if user tapped a link
             UIApplication.shared.open(url)
             decisionHandler(.cancel)
         } else {
-            // For other navigation types, just cancel (don't open Safari)
             decisionHandler(.cancel)
         }
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // Initial settings application once page is loaded
         parent.applyCurrentSettingsToWebView(webView)
         
-        // Update navigation state
         DispatchQueue.main.async {
             self.parent.webViewStore.canGoBack = webView.canGoBack
-            // Only show back button if navigation was user-initiated
-            switch self.lastNavigationType {
-            case .linkActivated, .formSubmitted, .backForward:
-                self.showBackButton.wrappedValue = true
-            default:
-                break
+            if self.pendingUserInitiatedNavigation || webView.canGoBack {
+                self.showBackButton.wrappedValue = webView.canGoBack
             }
+            self.pendingUserInitiatedNavigation = false
         }
     }
     
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-        // Update navigation state when navigation starts
         DispatchQueue.main.async {
             self.parent.webViewStore.canGoBack = webView.canGoBack
+        }
+    }
+    
+    private func isUserInitiated(_ navigationType: WKNavigationType) -> Bool {
+        switch navigationType {
+        case .linkActivated, .formSubmitted, .formResubmitted, .backForward:
+            return true
+        default:
+            return false
         }
     }
     
