@@ -17,69 +17,56 @@ struct YoutubeWebView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let webView = webViewStore.webView!
         webView.navigationDelegate = context.coordinator
-        webView.backgroundColor = settings.isDarkMode ? .black : .white
-        webView.scrollView.backgroundColor = settings.isDarkMode ? .black : .white
+        applySettings(to: webView)
         return webView
     }
     
     func updateUIView(_ webView: WKWebView, context: Context) {
-        applyCurrentSettingsToWebView(webView)
+        // SwiftUI calls this on every state change (the back button, canGoBack…), so only the
+        // settings are re-applied here; the page scripts are injected once per load, in didFinish.
+        applySettings(to: webView)
     }
     
     func makeCoordinator() -> WebViewCoordinator {
         WebViewCoordinator(self, showBackButton: $showBackButton)
     }
     
-    func applyCurrentSettingsToWebView(_ webView: WKWebView) {
-        // Helper to load JS from file
-        func loadJS(named name: String) -> String? {
-            guard let url = Bundle.main.url(forResource: name, withExtension: "js", subdirectory: ""),
-                  let data = try? Data(contentsOf: url),
-                  let js = String(data: data, encoding: .utf8) else { return nil }
-            return js
+    /// Reads a script bundled in Yutub/scripts.
+    private static func loadJS(named name: String) -> String? {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "js"),
+              let js = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        return js
+    }
+
+    private static func run(_ js: String, in webView: WKWebView, label: String) {
+        webView.evaluateJavaScript(js) { _, error in
+            if let error { print("Error injecting \(label): \(error.localizedDescription)") }
         }
-        
-#if DEBUG
-        // Load and inject debugConsole.js
-        if let debugConsole = loadJS(named: "debugConsole") {
-            webView.evaluateJavaScript(debugConsole) { _, error in
-                if let error = error { print("Error debugConsole: \(error.localizedDescription)") }
-            }
+    }
+
+    /// The scripts that reshape YouTube's player. They build DOM and add observers, so each one
+    /// runs at most once per page: a flag on `window` makes a second injection a no-op.
+    /// YouTube navigates between videos without reloading, so once per page load is enough.
+    func injectPageScripts(into webView: WKWebView) {
+        for name in ["controlAlignment", "centeredControls", "scrubberButtonStyle"] {
+            guard let js = Self.loadJS(named: name) else { continue }
+            let flag = "__yutub_\(name)"
+            Self.run("if (!window.\(flag)) { window.\(flag) = true; \(js)\n}", in: webView, label: name)
         }
-#endif
-        
-        // Load and inject controlAlignment.js
-        if let controlAlignmentJS = loadJS(named: "controlAlignment") {
-            webView.evaluateJavaScript(controlAlignmentJS) { _, error in
-                if let error = error { print("Error controlAlignment: \(error.localizedDescription)") }
-            }
+        applySettings(to: webView)
+    }
+
+    /// Dark mode and autoplay: cheap and idempotent, so they can run whenever a setting changes.
+    func applySettings(to webView: WKWebView) {
+        if let js = Self.loadJS(named: "darkMode") {
+            Self.run(js.replacingOccurrences(of: "/*__DARK_MODE__*/", with: settings.isDarkMode ? "true" : "false"), in: webView, label: "darkMode")
         }
-        // Load and inject centeredControls.js
-        if let centreTransportJS = loadJS(named: "centeredControls") {
-            webView.evaluateJavaScript(centreTransportJS) { _, error in
-                if let error = error { print("Error centering controls: \(error.localizedDescription)") }
-            }
+        if let js = Self.loadJS(named: "autoplay") {
+            Self.run(js.replacingOccurrences(of: "/*__AUTOPLAY__*/", with: settings.autoplayEnabled ? "true" : "false"), in: webView, label: "autoplay")
         }
-        // Load and inject darkMode.js, replacing placeholder
-        if var darkModeJS = loadJS(named: "darkMode") {
-            darkModeJS = darkModeJS.replacingOccurrences(of: "/*__DARK_MODE__*/", with: settings.isDarkMode ? "true" : "false")
-            webView.evaluateJavaScript(darkModeJS) { _, error in
-                if let error = error { print("Error injecting dark mode script: \(error.localizedDescription)") }
-            }
-        }
-        // Load and inject autoplay.js, replacing placeholder
-        if var autoplayJS = loadJS(named: "autoplay") {
-            autoplayJS = autoplayJS.replacingOccurrences(of: "/*__AUTOPLAY__*/", with: settings.autoplayEnabled ? "true" : "false")
-            webView.evaluateJavaScript(autoplayJS) { _, error in
-                if let error = error { print("Error injecting autoplay script: \(error.localizedDescription)") }
-            }
-        }
-        // Load and inject scrubberButtonStyle.js
-        if let scrubberButtonStyleJS = loadJS(named: "scrubberButtonStyle") {
-            webView.evaluateJavaScript(scrubberButtonStyleJS) { _, error in
-                if let error = error { print("Error modifying scrubber button size: \(error.localizedDescription)") }
-            }
-        }
+        let background: UIColor = settings.isDarkMode ? .black : .white
+        webView.backgroundColor = background
+        webView.scrollView.backgroundColor = background
     }
 }
 
@@ -95,21 +82,19 @@ class WebViewStore: NSObject, ObservableObject, WKScriptMessageHandler {
         // Set up user content controller and configuration
         let contentController = WKUserContentController()
         
-        // Load debugConsole.js from file and add as user script
+#if DEBUG
+        // Forward the page's console to Xcode's, in debug builds only.
         if let debugConsoleURL = Bundle.main.url(forResource: "debugConsole", withExtension: "js"),
-           let debugConsoleContent = try? String(contentsOf: debugConsoleURL) {
+           let debugConsoleContent = try? String(contentsOf: debugConsoleURL, encoding: .utf8) {
             let userScript = WKUserScript(source: debugConsoleContent, injectionTime: .atDocumentStart, forMainFrameOnly: false)
             contentController.addUserScript(userScript)
         }
-        
-        // Add self as message handler
         contentController.add(self, name: "jsConsole")
+#endif
         
         let config = WKWebViewConfiguration()
         config.userContentController = contentController
-        if #available(macOS 12.3, *) {
-            config.preferences.isElementFullscreenEnabled = true
-        }
+        config.preferences.isElementFullscreenEnabled = true
         self.webView = WKWebView(frame: .zero, configuration: config)
         self.webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
         
@@ -161,7 +146,7 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
         // Track the navigation type
         lastNavigationType = navigationAction.navigationType
         
-        if isYouTubeRelated(url: url) {
+        if Self.isAllowed(url) {
             // Allow navigation within the web view
             decisionHandler(.allow)
         } else if navigationAction.navigationType == .linkActivated {
@@ -175,8 +160,7 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // Initial settings application once page is loaded
-        parent.applyCurrentSettingsToWebView(webView)
+        parent.injectPageScripts(into: webView)
         
         // Update navigation state
         DispatchQueue.main.async {
@@ -198,8 +182,14 @@ class WebViewCoordinator: NSObject, WKNavigationDelegate {
         }
     }
     
-    private func isYouTubeRelated(url: URL) -> Bool {
-        let youtubeDomains = ["youtube.com", "youtu.be", "accounts.google.com", "accounts.google"]
-        return youtubeDomains.contains { url.host?.contains($0) == true }
+    /// Whether a URL may load inside the app: YouTube itself, and Google's sign-in on any of its
+    /// country domains (accounts.google.com, accounts.google.es, accounts.google.co.uk…).
+    /// Hosts are matched exactly or by subdomain, so look-alikes such as `youtube.com.example.net`
+    /// or `notyoutube.com` open in Safari (if tapped) instead of inside the app.
+    static func isAllowed(_ url: URL) -> Bool {
+        guard ["https", "http"].contains(url.scheme?.lowercased() ?? ""), let host = url.host?.lowercased() else { return false }
+        let domains = ["youtube.com", "youtu.be", "accounts.google.com"]
+        if domains.contains(where: { host == $0 || host.hasSuffix("." + $0) }) { return true }
+        return host.range(of: #"^accounts\.google\.(com?\.)?[a-z]{2,3}$"#, options: .regularExpression) != nil
     }
 }

@@ -14,7 +14,7 @@
 		5FD495612CB456BA00052FEC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD495602CB456BA00052FEC /* ContentView.swift */; };
 		5FD495632CB456BD00052FEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FD495622CB456BD00052FEC /* Assets.xcassets */; };
 		5FD495662CB456BD00052FEC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5FD495652CB456BD00052FEC /* Preview Assets.xcassets */; };
-		5FD495712CB456BD00052FEC /* WhassapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD495702CB456BD00052FEC /* WhassapTests.swift */; };
+		5FD495712CB456BD00052FEC /* YutubTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD495702CB456BD00052FEC /* YutubTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,7 +23,7 @@
 			containerPortal = 5FD4954F2CB456BA00052FEC /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 5FD495562CB456BA00052FEC;
-			remoteInfo = Whassap;
+			remoteInfo = Yutub;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -38,7 +38,7 @@
 		5FD495652CB456BD00052FEC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5FD495672CB456BD00052FEC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5FD4956C2CB456BD00052FEC /* YutubTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YutubTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5FD495702CB456BD00052FEC /* WhassapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhassapTests.swift; sourceTree = "<group>"; };
+		5FD495702CB456BD00052FEC /* YutubTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YutubTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -117,7 +117,7 @@
 		5FD4956F2CB456BD00052FEC /* YutubTests */ = {
 			isa = PBXGroup;
 			children = (
-				5FD495702CB456BD00052FEC /* WhassapTests.swift */,
+				5FD495702CB456BD00052FEC /* YutubTests.swift */,
 			);
 			path = YutubTests;
 			sourceTree = "<group>";
@@ -239,7 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5FD495712CB456BD00052FEC /* WhassapTests.swift in Sources */,
+				5FD495712CB456BD00052FEC /* YutubTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,7 +435,7 @@
 				DEVELOPMENT_TEAM = 5UXXXESGMK;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = pegpeg.WhassapTests;
+				PRODUCT_BUNDLE_IDENTIFIER = pegpeg.YutubTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -456,7 +456,7 @@
 				DEVELOPMENT_TEAM = 5UXXXESGMK;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = pegpeg.WhassapTests;
+				PRODUCT_BUNDLE_IDENTIFIER = pegpeg.YutubTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
