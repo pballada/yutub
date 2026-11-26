@@ -18,7 +18,7 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $selectedTab.onChange { newValue in
-            // Pause video on tab switch to avoid overlapping audio
+            // Each tab loads its YouTube page in the shared web view
             updateWebViewURL(for: newValue)
         }) {
             // Home Tab
